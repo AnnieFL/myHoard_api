@@ -8,6 +8,7 @@ UsersModel.init({
     name: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
+    picture: DataTypes.STRING,
     permissions: DataTypes.ARRAY(DataTypes.STRING),
     active: DataTypes.BOOLEAN
 }, { 
@@ -17,5 +18,4 @@ UsersModel.init({
 });
 
 
-sequelizeCon.sync();
 module.exports = { UsersModel };

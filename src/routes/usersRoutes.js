@@ -9,6 +9,7 @@ const usersController = new UsersController();
 
 
 usersRouter.get('/list', (req, res) => usersController.listUsers(req, res));
+usersRouter.get('/top/:number', (req, res) => usersController.listTopUsers(req, res));
 
 usersRouter.post('/signin', (req, res) => usersController.signIn(req, res));
 usersRouter.post('/login', (req, res) => usersController.logIn(req, res));

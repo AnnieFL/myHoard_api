@@ -21,8 +21,10 @@ ThingsModel.init({
 });
 
 ThingsModel.belongsTo(UsersModel);
+UsersModel.hasMany(ThingsModel);
 
 ThingsModel.belongsTo(CategoriesModel);
+CategoriesModel.hasMany(ThingsModel)
 
 sequelizeCon.sync();
 

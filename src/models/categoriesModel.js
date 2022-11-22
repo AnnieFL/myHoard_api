@@ -8,6 +8,8 @@ CategoriesModel.init({
     name: DataTypes.STRING,
     rarity: DataTypes.INTEGER,
     translations: DataTypes.JSON,
+    picture: DataTypes.STRING,
+    points: DataTypes.INTEGER,
     active: DataTypes.BOOLEAN
 }, { 
     sequelize: sequelizeCon, 
