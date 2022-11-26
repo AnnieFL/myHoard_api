@@ -15,7 +15,11 @@ const usersSchemaCreate = Joi.object({
 const usersSchemaLogin = Joi.object({
     password: Joi.string().required(),
 
-    email: Joi.string().email().required(),
+    name: Joi.string()
+        .alphanum()
+        .min(3)
+        .max(30)
+        .required(),
 });
 
 const usersSchemaEdit = Joi.object({

@@ -3,6 +3,7 @@ const Util = require('../classes/Util');
 const jwt = require('jsonwebtoken');
 const Sequelize = require('sequelize')
 const { validateUser } = require('../validators/usersValidator');
+const {noIcon} = require("../config/constants");
 
 const sequelize = new Sequelize(process.env.DB_URI, {
     dialectOptions: {
@@ -38,19 +39,20 @@ class UsersController {
         const [users, metadata] = await sequelize.query(`
         SELECT
             users.name AS name,
+            users.picture AS picture,
             sum(categories.points) AS score
         FROM
             "myHoard".users users
-        INNER JOIN "myHoard".things things ON
+        LEFT JOIN "myHoard".things things ON
             things."userId" = users.id
             AND things.active = true
-        INNER JOIN "myHoard".categories categories ON
+        LEFT JOIN "myHoard".categories categories ON
             categories.id = things."categoryId"
             AND categories.active = true
         WHERE
-            users.active = false
+            users.active = true
         GROUP BY
-            users.name
+            users.name, users.picture
         ORDER BY
             score DESC
         LIMIT ${number}
@@ -62,32 +64,32 @@ class UsersController {
     async signIn(req, res) {
         const email = req.body.email.toLowerCase();
         const { name } = req.body;
-        const password = Util.encrypt(req.body.password);
+        const password = await Util.encrypt(req.body.password);
 
-        const validationError = validateUser(user, "create");
+        const validationError = validateUser({email, name, password}, "create");
         if (validationError) {
             return res.status(400).json({ validationError });
         }
 
         const user = await UsersModel.create({
-            email, name, password, active: true
+            email, name, password, picture: noIcon, active: true
         });
+        const token = jwt.sign(user.dataValues, process.env.JWT_SECRET)
 
         return res.status(201).json(user);
     }
 
     async logIn(req, res) {
-        const email = req.body.email.toLowerCase();
-        const password = Util.encrypt(req.body.password);
+        const {name, password} = req.body;
 
-        const validationError = validateUser({ email, password }, "login");
+        const validationError = validateUser({ name, password }, "login");
         if (validationError) {
             return res.status(400).json({ validationError });
         }
 
         const user = await UsersModel.findOne({
             where: {
-                email
+                name
             }
         });
 
@@ -97,7 +99,7 @@ class UsersController {
             return res.status(400).json({ msg: { pt: "Usuário e senha não se encaixam!", en: "Username and Password aren't matching!", go: "User, Password, Not match " } });
         }
         const token = jwt.sign(user.dataValues, process.env.JWT_SECRET)
-        return res.json(token);
+        return res.json({user, token});
     }
 
     async editUser(req, res) {

@@ -8,7 +8,7 @@ UsersModel.init({
     name: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
-    picture: DataTypes.STRING,
+    picture: DataTypes.STRING(150000),
     permissions: DataTypes.ARRAY(DataTypes.STRING),
     active: DataTypes.BOOLEAN
 }, { 

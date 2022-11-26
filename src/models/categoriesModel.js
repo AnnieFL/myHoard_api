@@ -8,7 +8,8 @@ CategoriesModel.init({
     name: DataTypes.STRING,
     rarity: DataTypes.INTEGER,
     translations: DataTypes.JSON,
-    picture: DataTypes.STRING,
+    pictureLocked: DataTypes.STRING,
+    pictureUnlocked: DataTypes.STRING,
     points: DataTypes.INTEGER,
     active: DataTypes.BOOLEAN
 }, { 
