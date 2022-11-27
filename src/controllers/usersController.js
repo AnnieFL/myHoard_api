@@ -133,9 +133,12 @@ class UsersController {
 
     async editUser(req, res) {
         const email = req.params.email.toLowerCase();
-        
+
+        console.log(req.params);
+        console.log(req.body);
         const validationError = validateUser({ email, name: req.body.name, password: req.body.password ? req.body.password : "", picture: req.body.picture }, "edit");
         if (validationError) {
+            console.log(validationError);
             return res.status(400).json({ validationError });
         }
 
