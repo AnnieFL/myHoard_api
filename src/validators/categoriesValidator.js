@@ -1,15 +1,15 @@
 const Joi = require("joi");
 
 const categoriesSchemaCreate = Joi.object({
-    name: Joi.string()
-        .alphanum()
-        .min(3)
-        .max(30)
-        .required(),
+    name: Joi.string().required(),
 
     rarity: Joi.number().required(),
 
-    id: Joi.number().required()
+    pictureLocked: Joi.string(),
+
+    pictureUnlocked: Joi.string(),
+
+    points: Joi.number()
 });
 
 const categoriesSchemaEdit = Joi.object({

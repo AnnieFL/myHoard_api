@@ -9,7 +9,7 @@ const categoriesController = new CategoriesController();
 
 categoriesRouter.get('/list', (req, res) => categoriesController.listCategories(req, res));
 
-categoriesRouter.post('/create', (req, res) => categoriesController.createCategory(req, res));
+categoriesRouter.post('/create', isAuth, (req, res) => categoriesController.createCategory(req, res));
 
 categoriesRouter.put('/edit/:id', isAuth, isAllowed("DELETE_CATEGORY"), (req, res) => categoriesController.editCategory(req, res));
 

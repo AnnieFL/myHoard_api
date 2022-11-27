@@ -7,9 +7,8 @@ class CategoriesModel extends Model {}
 CategoriesModel.init({
     name: DataTypes.STRING,
     rarity: DataTypes.INTEGER,
-    translations: DataTypes.JSON,
-    pictureLocked: DataTypes.STRING,
-    pictureUnlocked: DataTypes.STRING,
+    pictureLocked: DataTypes.STRING(150000),
+    pictureUnlocked: DataTypes.STRING(150000),
     points: DataTypes.INTEGER,
     active: DataTypes.BOOLEAN
 }, { 

@@ -19,6 +19,23 @@ class ThingsController {
         return res.json(things);
     }
 
+    async latestThings(req, res) {
+        const offset = req.query.offset ? req.query.offset : 0;
+        if (parseInt(offset) != offset) {
+            console.log(offset);
+            res.status(400).json({msg: "Invalid offset value"});
+        }
+
+        const things = await ThingsModel.findAll({
+            include: [UsersModel, CategoriesModel],
+            order: [["createdAt", "DESC"]],
+            limit: 15,
+            offset
+        })
+
+        res.status(200).json(things);
+    }
+
 
     async createThing(req, res) {
         const {name, size, age, photo} = req.body;

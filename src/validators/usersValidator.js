@@ -22,13 +22,19 @@ const usersSchemaLogin = Joi.object({
         .required(),
 });
 
+const usersSchemaGrantAdmin = Joi.object({
+    email: Joi.string().email().required()
+})
+
 const usersSchemaEdit = Joi.object({
     name: Joi.string()
         .alphanum()
         .min(3)
         .max(30),
 
-    password: Joi.string(),
+    picture: Joi.string().empty().allow(''),
+    
+    password: Joi.string().empty().allow(''),
 
     email: Joi.string().email().required()
 })
@@ -41,6 +47,8 @@ const validateUser = (user, action) => {
         validation = usersSchemaEdit.validate(user);
     } else if (action === "login") {
         validation = usersSchemaLogin.validate(user);
+    } else if (action === "grantAdmin") {
+        validation = usersSchemaGrantAdmin.validate(user);
     }
 
     if (validation.error) {

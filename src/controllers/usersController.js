@@ -70,13 +70,13 @@ class UsersController {
         if (validationError) {
             return res.status(400).json({ validationError });
         }
-
+        
         const user = await UsersModel.create({
             email, name, password, picture: noIcon, active: true
         });
         const token = jwt.sign(user.dataValues, process.env.JWT_SECRET)
 
-        return res.status(201).json(user);
+        return res.status(201).json({ user: { id: user.id, email: user.email, name: user.name, picture: user.picture, permissions: user.permissions }, token});
     }
 
     async logIn(req, res) {
@@ -99,13 +99,13 @@ class UsersController {
             return res.status(400).json({ msg: { pt: "Usuário e senha não se encaixam!", en: "Username and Password aren't matching!", go: "User, Password, Not match " } });
         }
         const token = jwt.sign(user.dataValues, process.env.JWT_SECRET)
-        return res.json({user, token});
+        return res.json({user: {name: user.name, email: user.email, id: user.id, picture: user.picture, permissions: user.permissions}, token});
     }
 
-    async editUser(req, res) {
-        const email = req.params.email.toLowerCase();
+    async grantAdmin(req, res) {
+        const email = req.body.email.toLowerCase();
 
-        const validationError = validateUser({ email, name: req.body.name, password: req.body.password }, "edit");
+        const validationError = validateUser({email}, "grantAdmin");
         if (validationError) {
             return res.status(400).json({ validationError });
         }
@@ -115,16 +115,45 @@ class UsersController {
                 email
             }
         })
+
         if (!user) {
-            return res.status(404).json({ msg: { pt: "Usuário não encontrado", en: "User not found", go: "You are not you!" } });
+            return res.status(404).json({ msg: "User not found" });
         }
 
-        const name = req.body.name ? req.body.name : user.name;
+        await UsersModel.update(
+            {permissions: ["ADMIN"]},
+            {
+                where: {
+                    email
+                }
+            })
+
+        return res.status(200).json({msg: "Admin permissions granted to user"});
+    }
+
+    async editUser(req, res) {
+        const email = req.params.email.toLowerCase();
+        
+        const validationError = validateUser({ email, name: req.body.name, password: req.body.password ? req.body.password : "", picture: req.body.picture }, "edit");
+        if (validationError) {
+            return res.status(400).json({ validationError });
+        }
+
+        let user = await UsersModel.findOne({
+            where: {
+                email
+            }
+        })
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        const {name} = req.body;
         const password = req.body.password ? Util.encrypt(req.body.password) : user.password;
-        const permissions = req.body.permissions && req.body.permissions[0] ? req.body.permissions : user.permissions;
+        const picture = req.body.picture ? req.body.picture : user.picture;
 
         await UsersModel.update(
-            { name, password, permissions },
+            { name, password, picture },
             {
                 where: {
                     email
@@ -132,7 +161,15 @@ class UsersController {
             }
         )
 
-        return res.status(200).json({ msg: { pt: "Alterado com sucesso", en: "Edited successfully", go: "You changed!" } });
+        user = await UsersModel.findOne({
+            where: {
+                email
+            }
+        });
+
+        const token = jwt.sign(user.dataValues, process.env.JWT_SECRET)
+
+        return res.json({ user: { name: user.name, email: user.email, id: user.id, picture: user.picture, permissions: user.permissions }, token });
     }
 
     async deleteUser(req, res) {

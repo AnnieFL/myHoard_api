@@ -19,17 +19,19 @@ class CategoriesController {
 
 
     async createCategory(req, res) {
-        const {name, rarity, translations} = req.body;
-
-        const validationError = validateCategory({name, rarity}, "create");
+        const {name, rarity, pictureLocked, pictureUnlocked, points} = req.body;
+        
+        const validationError = validateCategory({name, rarity, pictureLocked, pictureUnlocked, points}, "create");
         if (validationError) {
+            console.log(validationError);
             return res.status(400).json({ validationError });
         }
 
+        console.log(req);
         const active = req.admin ? req.admin : false;
 
         const category = await CategoriesModel.create({
-            name, rarity, translations, active
+            name, rarity, pictureLocked, pictureUnlocked, points, active
         });
 
         return res.status(201).json(category);
