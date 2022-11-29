@@ -1,6 +1,6 @@
 const isItself  = (req, res, next) => {
     const token = req.user;
-    const email = req.params.email.toLowerCase();
+    const {id} = req.params;
 
     if (req.user.permissions.includes('ADMIN')) {
 
@@ -8,7 +8,7 @@ const isItself  = (req, res, next) => {
         return next();
     }
 
-    if (token.email != email) {
+    if (token.id != id) {
         return res.status(401).json({msg: "Not Allowed"}); 
     }
     next();

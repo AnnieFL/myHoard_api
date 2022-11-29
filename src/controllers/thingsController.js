@@ -27,7 +27,8 @@ class ThingsController {
         }
 
         const things = await ThingsModel.findAll({
-            include: [UsersModel, CategoriesModel],
+            where: {active: true, verified: true},
+            include: [{model: UsersModel, attributes: ["name", "picture"], where: {active: true}}, {model: CategoriesModel, attributes: ["name", "pictureLocked", "pictureUnlocked", "rarity"], where: {active: true}}],
             order: [["createdAt", "DESC"]],
             limit: 15,
             offset
@@ -38,13 +39,13 @@ class ThingsController {
 
 
     async createThing(req, res) {
-        const {name, size, age, photo} = req.body;
+        const {name, size, age, picture, categoryId} = req.body;
         const userId = req.user.id;
-        const {categoryId} = req.params;
 
 
-        const validationError = validateThing({name, size, age, photo}, "create");
+        const validationError = validateThing({ name, size, age, picture, categoryId }, "create");
         if (validationError) {
+            console.log(validationError);
             return res.status(400).json({ validationError });
         }
 
@@ -68,7 +69,7 @@ class ThingsController {
     
         const active = req.admin ? req.admin : false;
 
-        const thing = await ThingsModel.create({name, size, age, photo, active, verified: active, userId, categoryId});
+        const thing = await ThingsModel.create({ name, size, age, picture, active, verified: active, userId, categoryId});
 
         return res.status(201).json(thing);
     }

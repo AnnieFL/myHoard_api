@@ -32,11 +32,9 @@ const usersSchemaEdit = Joi.object({
         .min(3)
         .max(30),
 
-    picture: Joi.string().empty().allow(''),
+    picture: Joi.string().empty().allow('').max(150000),
     
     password: Joi.string().empty().allow(''),
-
-    email: Joi.string().email().required()
 })
 
 const validateUser = (user, action) => {

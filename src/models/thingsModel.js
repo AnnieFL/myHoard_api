@@ -8,8 +8,8 @@ class ThingsModel extends Model {}
     
 ThingsModel.init({
     name: DataTypes.STRING,
-    size: DataTypes.INTEGER,
-    age: DataTypes.INTEGER,
+    size: DataTypes.FLOAT,
+    age: DataTypes.FLOAT,
     picture: DataTypes.STRING(150000),
     active: DataTypes.BOOLEAN,
     verified: DataTypes.BOOLEAN,

@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const Sequelize = require('sequelize')
 const { validateUser } = require('../validators/usersValidator');
 const {noIcon} = require("../config/constants");
+const { ThingsModel } = require('../models/thingsModel');
+const { CategoriesModel } = require('../models/categoriesModel');
 
 const sequelize = new Sequelize(process.env.DB_URI, {
     dialectOptions: {
@@ -58,7 +60,48 @@ class UsersController {
         LIMIT ${number}
         `);
 
+
         return res.json(users);
+    }
+
+    async info(req, res) {
+        const { id } = req.params
+
+        const [score, metadata] = await sequelize.query(`
+        SELECT
+            sum(categories.points) AS score
+        FROM
+            "myHoard".users users
+        LEFT JOIN "myHoard".things things ON
+            things."userId" = users.id
+            AND things.active = true
+        LEFT JOIN "myHoard".categories categories ON
+            categories.id = things."categoryId"
+            AND categories.active = true
+        WHERE
+            users.active = true AND users.id = ${id}
+        `);
+
+        const things = await ThingsModel.count({
+            where: {
+                userId: id,
+                active: true
+            }
+        })
+
+        const [categories, metadataCategories] = await sequelize.query(`
+        SELECT
+            categories.*
+        FROM
+            "myHoard".categories categories
+        INNER JOIN "myHoard".things things ON
+            things."userId" = ${id}
+            AND things.active = true
+        GROUP BY
+            categories.id
+        `);
+
+        return res.json({score: score[0] ? score[0].score : 0, things, categories});
     }
 
     async signIn(req, res) {
@@ -74,7 +117,7 @@ class UsersController {
         const user = await UsersModel.create({
             email, name, password, picture: noIcon, active: true
         });
-        const token = jwt.sign(user.dataValues, process.env.JWT_SECRET)
+        const token = jwt.sign({id: user.id, email: user.email, name: user.name, permissions: user.permissions}, process.env.JWT_SECRET)
 
         return res.status(201).json({ user: { id: user.id, email: user.email, name: user.name, picture: user.picture, permissions: user.permissions }, token});
     }
@@ -93,12 +136,17 @@ class UsersController {
             }
         });
 
+        if (!user) {
+            return res.status(404).json({ msg: "User doesn't exist!" });
+
+        }
+
         const match = await Util.compare(password, user.password);
 
         if (!match) {
             return res.status(400).json({ msg: { pt: "Usuário e senha não se encaixam!", en: "Username and Password aren't matching!", go: "User, Password, Not match " } });
         }
-        const token = jwt.sign(user.dataValues, process.env.JWT_SECRET)
+        const token = jwt.sign({ id: user.id, email: user.email, name: user.name, permissions: user.permissions }, process.env.JWT_SECRET)
         return res.json({user: {name: user.name, email: user.email, id: user.id, picture: user.picture, permissions: user.permissions}, token});
     }
 
@@ -132,11 +180,9 @@ class UsersController {
     }
 
     async editUser(req, res) {
-        const email = req.params.email.toLowerCase();
+        const {id} = req.params;
 
-        console.log(req.params);
-        console.log(req.body);
-        const validationError = validateUser({ email, name: req.body.name, password: req.body.password ? req.body.password : "", picture: req.body.picture }, "edit");
+        const validationError = validateUser({ name: req.body.name, password: req.body.password ? req.body.password : "", picture: req.body.picture }, "edit");
         if (validationError) {
             console.log(validationError);
             return res.status(400).json({ validationError });
@@ -144,7 +190,7 @@ class UsersController {
 
         let user = await UsersModel.findOne({
             where: {
-                email
+                id
             }
         })
         if (!user) {
@@ -159,28 +205,28 @@ class UsersController {
             { name, password, picture },
             {
                 where: {
-                    email
+                    id
                 }
             }
         )
 
         user = await UsersModel.findOne({
             where: {
-                email
+                id
             }
         });
 
-        const token = jwt.sign(user.dataValues, process.env.JWT_SECRET)
+        const token = jwt.sign({ id: user.id, email: user.email, name: user.name, permissions: user.permissions }, process.env.JWT_SECRET)
 
         return res.json({ user: { name: user.name, email: user.email, id: user.id, picture: user.picture, permissions: user.permissions }, token });
     }
 
     async deleteUser(req, res) {
-        const email = req.params.email.toLowerCase();
+        const {id} = req.params;
 
         const user = await UsersModel.findOne({
             where: {
-                email
+                id
             }
         })
         if (!user) {
@@ -191,7 +237,7 @@ class UsersController {
             { active: false },
             {
                 where: {
-                    email
+                    id
                 }
             }
         )

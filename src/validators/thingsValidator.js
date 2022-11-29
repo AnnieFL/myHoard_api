@@ -1,17 +1,15 @@
 const Joi = require("joi");
 
 const thingsSchemaCreate = Joi.object({
-    name: Joi.string()
-        .alphanum()
-        .min(3)
-        .max(30)
-        .required(),
+    name: Joi.string().required(),
 
     size: Joi.number(),
 
     age: Joi.number(),
 
-    photo: Joi.string()
+    picture: Joi.string().max(150000).required(),
+
+    categoryId: Joi.number().required()
 });
 
 const thingsSchemaEdit = Joi.object({
@@ -25,7 +23,9 @@ const thingsSchemaEdit = Joi.object({
 
     age: Joi.number(),
 
-    photo: Joi.string()
+    picture: Joi.string(),
+
+    categoryId: Joi.number().required()
 })
 
 const validateThing = (user, action) => {
