@@ -6,8 +6,9 @@ const ThingsController = require('../controllers/thingsController');
 const thingsController = new ThingsController();
 
 
-thingsRouter.get('/list', (req, res) => thingsController.listThings(req, res));
 thingsRouter.get('/latest', (req, res) => thingsController.latestThings(req, res));
+thingsRouter.get('/list', isAuth, (req, res) => thingsController.listThings(req, res));
+thingsRouter.get('/details/:id', isAuth, (req, res) => thingsController.detailThing(req, res));
 
 thingsRouter.post('/create', isAuth, (req, res) => thingsController.createThing(req, res));
 

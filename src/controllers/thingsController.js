@@ -12,7 +12,8 @@ class ThingsController {
     async listThings(req, res) {
         const things = await ThingsModel.findAll({
             where: {
-                active: true
+                active: true,
+                userId: req.user.id
             }
         });
 
@@ -28,7 +29,7 @@ class ThingsController {
 
         const things = await ThingsModel.findAll({
             where: {active: true, verified: true},
-            include: [{model: UsersModel, attributes: ["name", "picture"], where: {active: true}}, {model: CategoriesModel, attributes: ["name", "pictureLocked", "pictureUnlocked", "rarity"], where: {active: true}}],
+            include: [{model: UsersModel, attributes: ["id", "name", "picture"], where: {active: true}}, {model: CategoriesModel, attributes: ["id", "name", "picture", "rarity"], where: {active: true}}],
             order: [["createdAt", "DESC"]],
             limit: 15,
             offset
@@ -37,9 +38,22 @@ class ThingsController {
         res.status(200).json(things);
     }
 
+    async detailThing(req, res) {
+        const {id} = req.params;
+
+        const thing = await ThingsModel.findOne({
+            where: { id },
+            include: [{ model: UsersModel, attributes: ["id", "name", "picture"] }, { model: CategoriesModel, attributes: ["id", "name", "picture", "rarity"] }],
+            order: [["createdAt", "DESC"]]
+        });
+
+        res.status(200).json(thing);
+    }
 
     async createThing(req, res) {
-        const {name, size, age, picture, categoryId} = req.body;
+        const {name, picture, categoryId} = req.body;
+        const size = req.body.size ? req.body.size : 0;
+        const age = req.body.age ? req.body.age : null;
         const userId = req.user.id;
 
 

@@ -5,7 +5,10 @@ const thingsSchemaCreate = Joi.object({
 
     size: Joi.number(),
 
-    age: Joi.number(),
+    age: Joi.alternatives(
+        Joi.string(),
+        Joi.date()
+    ).allow(null),
 
     picture: Joi.string().max(150000).required(),
 
@@ -21,7 +24,10 @@ const thingsSchemaEdit = Joi.object({
 
     size: Joi.number(),
 
-    age: Joi.number(),
+    age: Joi.alternatives(
+        Joi.string(),
+        Joi.date()
+    ).allow(null),
 
     picture: Joi.string(),
 

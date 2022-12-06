@@ -9,11 +9,11 @@ class ThingsModel extends Model {}
 ThingsModel.init({
     name: DataTypes.STRING,
     size: DataTypes.FLOAT,
-    age: DataTypes.FLOAT,
+    age: DataTypes.DATEONLY,
     picture: DataTypes.STRING(150000),
     active: DataTypes.BOOLEAN,
     verified: DataTypes.BOOLEAN,
-    reports: DataTypes.INTEGER
+    reports: DataTypes.JSON
 }, { 
     sequelize: sequelizeCon, 
     schema: 'myHoard',

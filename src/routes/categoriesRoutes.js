@@ -7,7 +7,8 @@ const CategoriesController = require('../controllers/categoriesController')
 const categoriesController = new CategoriesController();
 
 
-categoriesRouter.get('/list', (req, res) => categoriesController.listCategories(req, res));
+categoriesRouter.get('/list', isAuth, (req, res) => categoriesController.listCategories(req, res));
+categoriesRouter.get('/details/:id', isAuth, (req, res) => categoriesController.detailCategory(req, res));
 
 categoriesRouter.post('/create', isAuth, (req, res) => categoriesController.createCategory(req, res));
 

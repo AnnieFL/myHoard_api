@@ -5,9 +5,7 @@ const categoriesSchemaCreate = Joi.object({
 
     rarity: Joi.number().required(),
 
-    pictureLocked: Joi.string(),
-
-    pictureUnlocked: Joi.string(),
+    picture: Joi.string(),
 
     points: Joi.number()
 });

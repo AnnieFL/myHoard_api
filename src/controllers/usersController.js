@@ -97,6 +97,7 @@ class UsersController {
         INNER JOIN "myHoard".things things ON
             things."userId" = ${id}
             AND things.active = true
+            AND things."categoryId" = categories."id"
         GROUP BY
             categories.id
         `);
@@ -115,7 +116,7 @@ class UsersController {
         }
         
         const user = await UsersModel.create({
-            email, name, password, picture: noIcon, active: true
+            email, name, password, picture: noIcon, active: true, permissions: []
         });
         const token = jwt.sign({id: user.id, email: user.email, name: user.name, permissions: user.permissions}, process.env.JWT_SECRET)
 
@@ -184,7 +185,6 @@ class UsersController {
 
         const validationError = validateUser({ name: req.body.name, password: req.body.password ? req.body.password : "", picture: req.body.picture }, "edit");
         if (validationError) {
-            console.log(validationError);
             return res.status(400).json({ validationError });
         }
 
