@@ -82,7 +82,7 @@ class CategoriesController {
             }
         })
         if (!category) {
-            return res.status(404).json({ msg: { pt: "Categoria não encontrada", en: "Category not found", go: "Category is not real!" } });
+            return res.status(404).json({ msg: "Category not found" });
         }
 
         const name = req.body.name ? req.body.name : category.name;
@@ -104,7 +104,7 @@ class CategoriesController {
             }
         )
 
-        return res.status(200).json({ msg: { pt: "Alterado com sucesso", en: "Edited successfully", go: "Category changed!" } });
+        return res.status(200).json({ msg: "Edited successfully" });
     }
 
     async deleteCategory(req, res) {
@@ -116,7 +116,7 @@ class CategoriesController {
             }
         })
         if (!category) {
-            return res.status(404).json({ msg: { pt: "Categoria não encontrada", en: "Category not found", go: "Category is not real!" } });
+            return res.status(404).json({ msg:"Category not found" });
         }
 
         await CategoriesModel.update(
@@ -128,7 +128,7 @@ class CategoriesController {
             }
         )
 
-        return res.status(200).json({ msg: { pt: "Apagado com sucesso", en: "Deleted successfully", go: "Category don't exist!" } });
+        return res.status(200).json({ msg: "Deleted successfully" });
 
     }
 }

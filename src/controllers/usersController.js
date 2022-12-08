@@ -32,7 +32,9 @@ class UsersController {
             }
         })
 
-        return res.json(users);
+        const usersReturn = users.map((user) => ({id: user.id, name: user.name, picture: user.picture, admin: user.permissions.includes("ADMIN")}))
+
+        return res.json(usersReturn);
     }
 
     async listTopUsers(req, res) {
@@ -67,6 +69,12 @@ class UsersController {
     async info(req, res) {
         const { id } = req.params
 
+        const user = await UsersModel.findOne({
+            where: {id}
+        })
+
+        const userReturn = {id: user.id, name: user.name, picture: user.picture, admin: user.permissions.includes("ADMIN")}
+        
         const [score, metadata] = await sequelize.query(`
         SELECT
             sum(categories.points) AS score
@@ -102,7 +110,7 @@ class UsersController {
             categories.id
         `);
 
-        return res.json({score: score[0] ? score[0].score : 0, things, categories});
+        return res.json({user: userReturn, score: score[0] ? score[0].score : 0, things, categories});
     }
 
     async signIn(req, res) {
@@ -145,7 +153,7 @@ class UsersController {
         const match = await Util.compare(password, user.password);
 
         if (!match) {
-            return res.status(400).json({ msg: { pt: "Usuário e senha não se encaixam!", en: "Username and Password aren't matching!", go: "User, Password, Not match " } });
+            return res.status(400).json({ msg: "Username and Password aren't matching!" });
         }
         const token = jwt.sign({ id: user.id, email: user.email, name: user.name, permissions: user.permissions }, process.env.JWT_SECRET)
         return res.json({user: {name: user.name, email: user.email, id: user.id, picture: user.picture, permissions: user.permissions}, token});
@@ -230,7 +238,7 @@ class UsersController {
             }
         })
         if (!user) {
-            return res.status(404).json({ msg: { pt: "Usuário não encontrado", en: "User not found", go: "You are not you!" } });
+            return res.status(404).json({ msg: "User not found" });
         }
 
         await UsersModel.update(
@@ -242,7 +250,7 @@ class UsersController {
             }
         )
 
-        return res.status(200).json({ msg: { pt: "Apagado com sucesso", en: "Deleted successfully", go: "You don't exist!" } });
+        return res.status(200).json({ msg: "Deleted successfully" });
 
     }
 }

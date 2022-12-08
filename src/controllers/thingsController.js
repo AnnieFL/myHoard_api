@@ -69,7 +69,7 @@ class ThingsController {
             }
         });
         if (!category) {
-            return res.status(404).json({msg: {pt: "Categoria não encontrada", en: "Category not found", go: "Category is not real!"}});
+            return res.status(404).json({msg:"Category not found"});
         }
 
         const user = await UsersModel.findOne({
@@ -78,7 +78,7 @@ class ThingsController {
             }
         });
         if (!user) {
-            return res.status(404).json({msg: {pt: "Usuário não encontrado", en: "User not found", go: "You are not you!"}});
+            return res.status(404).json({msg: "User not found"});
         }
     
         const active = req.admin ? req.admin : false;
@@ -102,7 +102,7 @@ class ThingsController {
             }
         })
         if (!thing) {
-            return res.status(404).json({msg: {pt: "Coisa não encontrada", en: "Thing not found", go: "Thing is not real!"}});
+            return res.status(404).json({msg:"Thing not found"});
         }
         
         const name = req.body.name ? req.body.name : thing.name;
@@ -120,7 +120,7 @@ class ThingsController {
             }
         )
 
-        return res.status(200).json({msg: {pt: "Alterado com sucesso", en: "Edited successfully", go: "Category changed!"}});
+        return res.status(200).json({msg:"Edited successfully"});
     }
 
     async deleteThing(req, res) {
@@ -132,7 +132,7 @@ class ThingsController {
             }
         })
         if (!thing) {
-            return res.status(404).json({msg: {pt: "Coisa não encontrada", en: "Thing not found", go: "Thing is not real!"}});
+            return res.status(404).json({msg: "Thing not found"});
         }
 
         await CategoriesModel.update(
@@ -144,7 +144,7 @@ class ThingsController {
             }
         )
 
-        return res.status(200).json({msg: {pt: "Apagado com sucesso", en: "Deleted successfully", go: "Category don't exist!"}});
+        return res.status(200).json({msg: "Deleted successfully"});
 
     }
 }
