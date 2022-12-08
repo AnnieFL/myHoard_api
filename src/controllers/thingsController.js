@@ -14,7 +14,8 @@ class ThingsController {
             where: {
                 active: true,
                 userId: req.user.id
-            }
+            },
+            order: [["createdAt","DESC"]]
         });
 
         return res.json(things);
@@ -44,7 +45,6 @@ class ThingsController {
         const thing = await ThingsModel.findOne({
             where: { id },
             include: [{ model: UsersModel, attributes: ["id", "name", "picture"] }, { model: CategoriesModel, attributes: ["id", "name", "picture", "rarity"] }],
-            order: [["createdAt", "DESC"]]
         });
 
         res.status(200).json(thing);
@@ -146,6 +146,65 @@ class ThingsController {
 
         return res.status(200).json({msg: "Deleted successfully"});
 
+    }
+
+    async approveThing(req, res) {
+        const {id} = req.params;
+
+        const thing = await ThingsModel.findOne({
+            where: {
+                id
+            }
+        })
+
+        if (!thing) {
+            return res.status(404).json({msg: "Thing does not exist!"});
+        }
+
+        await ThingsModel.update(
+            {active: true, verified: true},
+            {
+                where: {id}
+        }
+            )
+
+            return res.status(200).json({msg: "Thing approved!"});
+    }
+
+    async denyThing(req, res) {
+        const {id} = req.params;
+
+        const thing = await ThingsModel.findOne({
+            where: {
+                id
+            }
+        })
+
+        if (!thing) {
+            return res.status(404).json({msg: "Thing does not exist!"});
+        }
+
+        await ThingsModel.update(
+            {active: false, verified: true},
+            {
+                where: {id}
+        }
+            )
+
+            return res.status(200).json({msg: "Thing denied!"});
+    }
+
+    async listSubmissions(req, res) {
+        console.log(req.user);
+        
+        const things = await ThingsModel.findAll({
+            where: {
+                active: false, verified: false
+            },
+            include: [CategoriesModel]
+        })
+
+        return res.status(200).json(things);
     }
 }
 

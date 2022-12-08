@@ -2,7 +2,6 @@ const isAllowed = (permission) => {
     return function (req, res, next) {
         if (req.user.permissions.includes('ADMIN')) {
             req.admin = true;
-            console.log(req);
             return next();
         }
 

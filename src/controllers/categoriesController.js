@@ -131,6 +131,22 @@ class CategoriesController {
         return res.status(200).json({ msg: "Deleted successfully" });
 
     }
+
+    async listSuggestions(req, res) {
+        const categories = await CategoriesModel.findAll({
+            active: false, picture: null 
+        })
+
+        return res.status(200).json(categories);
+    }
+
+    async approveSuggestion(req, res) {
+        const {id} = req.params;
+
+        const {picture, points, rarity} = req.body;
+
+        console.log(req.body)
+    }
 }
 
 

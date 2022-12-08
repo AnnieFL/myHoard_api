@@ -58,7 +58,7 @@ class UsersController {
         GROUP BY
             users.name, users.picture
         ORDER BY
-            score DESC
+            score ASC
         LIMIT ${number}
         `);
 
@@ -237,6 +237,7 @@ class UsersController {
                 id
             }
         })
+
         if (!user) {
             return res.status(404).json({ msg: "User not found" });
         }
@@ -246,6 +247,15 @@ class UsersController {
             {
                 where: {
                     id
+                }
+            }
+        )
+
+        await ThingsModel.update(
+            {active: false},
+            {
+                where: {
+                    userId: id
                 }
             }
         )
